@@ -118,6 +118,17 @@ flowchart TB
 
 <sub>Conceptual target architecture; implementation details may evolve during development.</sub>
 
+## 💸 Zero-budget deployment
+
+ORBIT is designed around a **₹0/month development and demo target**. The proposed hosted stack is a free Render Node.js web service + Neon Free PostgreSQL + GitHub. No paid AI API is required for the core MCP tools; ChatGPT is the intended AI interface.
+
+Free tiers have hard limits: the Render service sleeps after inactivity, Neon has storage/compute/network quotas, and providers can change their plans. This is suitable for a hobby/demo deployment, **not guaranteed production uptime**.
+
+- [Zero-budget deployment guide](docs/ZERO-BUDGET-DEPLOYMENT.md)
+- [ChatGPT connection requirements](docs/CHATGPT-SETUP.md)
+
+**Important:** ORBIT v0.1.0 currently uses a single-owner bearer token. It is not a public multi-user SaaS and does not yet implement OAuth 2.1 or tenant isolation. Do not share one token with public users.
+
 ## ⚙️ Technology direction
 
 <div align="center">
@@ -148,7 +159,7 @@ The application source and first runnable release are not yet available in this 
 |---|---|
 | [Installation](docs/INSTALLATION.md) | Environment preparation and setup direction |
 | [ChatGPT connection](docs/CHATGPT-SETUP.md) | How the MCP connection is intended to work |
-| [Operations](docs/OPERATIONS.md) | Deployment and operational notes |
+| [Zero-budget deployment](docs/ZERO-BUDGET-DEPLOYMENT.md) | Free hosting plan and limits |\n| [Operations](docs/OPERATIONS.md) | Deployment and operational notes |
 | [Security](SECURITY.md) | Security expectations and reporting |
 | [Contributing](CONTRIBUTING.md) | How to contribute |
 | [Roadmap](ROADMAP.md) | Planned milestones |
