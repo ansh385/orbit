@@ -1,0 +1,28 @@
+import express from "express";
+import { resolve } from "node:path";
+import cors from "cors";
+import helmet from "helmet";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { config } from "./config.js";
+import { pool } from "./db/pool.js";
+import { authMiddleware } from "./security/auth.js";
+import { createMcpServer } from "./mcp/register-tools.js";
+import * as flow from "./engines/flow.js";
+import * as automate from "./engines/automate.js";
+const app=express();app.disable("x-powered-by");app.use(helmet({contentSecurityPolicy:false,crossOriginEmbedderPolicy:false}));
+app.use(cors({origin:config.CORS_ORIGIN.split(",").map(s=>s.trim()),methods:["GET","POST","PATCH","OPTIONS"],allowedHeaders:["Content-Type","Authorization","Mcp-Session-Id","Mcp-Protocol-Version"],exposedHeaders:["Mcp-Session-Id"]}));
+app.use(express.json({limit:"1mb"}));
+app.get("/health",async(_req,res)=>{try{await pool.query("SELECT 1");res.json({status:"ok",service:"orbit",version:"0.1.0",database:"connected"});}catch{res.status(503).json({status:"degraded",service:"orbit",database:"disconnected"});}});
+app.use("/api",authMiddleware);
+app.get("/api/overview",async(_req,res,next)=>{try{const[p,t,w]=await Promise.all([flow.listProjects(config.ORBIT_DEFAULT_USER_ID),flow.listTasks(config.ORBIT_DEFAULT_USER_ID),automate.listWorkflows(config.ORBIT_DEFAULT_USER_ID)]);res.json({projects:p.length,tasks:t.length,completedTasks:t.filter(x=>x.status==="done").length,workflows:w.length,engines:["Flow","Dev","Studio","Automate"]});}catch(e){next(e);}});
+app.get("/api/projects",async(_req,res,next)=>{try{res.json(await flow.listProjects(config.ORBIT_DEFAULT_USER_ID));}catch(e){next(e);}});
+app.post("/api/projects",async(req,res,next)=>{try{const name=String(req.body?.name??"").trim();if(!name||name.length>120)return res.status(400).json({error:"Project name is required (max 120 characters)."});res.status(201).json(await flow.createProject(config.ORBIT_DEFAULT_USER_ID,{name,description:String(req.body?.description??"")}));}catch(e){next(e);}});
+app.get("/api/tasks",async(_req,res,next)=>{try{res.json(await flow.listTasks(config.ORBIT_DEFAULT_USER_ID));}catch(e){next(e);}});
+app.post("/api/tasks",async(req,res,next)=>{try{const title=String(req.body?.title??"").trim();if(!title||title.length>200)return res.status(400).json({error:"Task title is required."});res.status(201).json(await flow.createTask(config.ORBIT_DEFAULT_USER_ID,{title,description:String(req.body?.description??""),projectId:req.body?.projectId||undefined,priority:["low","medium","high","urgent"].includes(req.body?.priority)?req.body.priority:"medium"}));}catch(e){next(e);}});
+app.patch("/api/tasks/:id",async(req,res,next)=>{try{res.json(await flow.updateTask(config.ORBIT_DEFAULT_USER_ID,req.params.id,req.body??{}));}catch(e){next(e);}});
+app.get("/api/workflows",async(_req,res,next)=>{try{res.json(await automate.listWorkflows(config.ORBIT_DEFAULT_USER_ID));}catch(e){next(e);}});
+app.all("/mcp",authMiddleware,async(req,res)=>{try{const server=createMcpServer();const transport=new StreamableHTTPServerTransport({sessionIdGenerator:undefined});res.on("close",()=>{void transport.close();void server.close();});await server.connect(transport);await transport.handleRequest(req,res,req.body);}catch(e){console.error("MCP request failed",e);if(!res.headersSent)res.status(500).json({error:"MCP request failed."});}});
+if(config.NODE_ENV==="production"){const web=resolve(process.cwd(),"../../apps/web/dist");app.use(express.static(web));app.get("*",(_req,res)=>res.sendFile(resolve(web,"index.html")));}
+app.use((error:unknown,_req:express.Request,res:express.Response,_next:express.NextFunction)=>{const message=error instanceof Error?error.message:"Unexpected server error.";res.status(/not found/i.test(message)?404:400).json({error:message});});
+const server=app.listen(config.PORT,config.HOST,()=>{console.log(`ORBIT listening on http://${config.HOST}:${config.PORT}`);console.log(`MCP endpoint: http://localhost:${config.PORT}/mcp`);});
+async function shutdown(){server.close();await pool.end();process.exit(0);}process.on("SIGINT",shutdown);process.on("SIGTERM",shutdown);
