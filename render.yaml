@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: orbit-mcp
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: ORBIT_API_TOKEN
+        generateValue: true
+      - key: ORBIT_DEFAULT_USER_ID
+        value: self-hosted
+      - key: CORS_ORIGIN
+        value: "*"
