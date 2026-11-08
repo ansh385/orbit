@@ -1,0 +1,33 @@
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
+import * as flow from "../engines/flow.js";
+import * as dev from "../engines/dev.js";
+import * as studio from "../engines/studio.js";
+import * as automate from "../engines/automate.js";
+import { config } from "../config.js";
+export function createMcpServer(){
+ const server=new McpServer({name:"orbit",version:"0.1.0"});const userId=config.ORBIT_DEFAULT_USER_ID;
+ const out=(value:unknown)=>({content:[{type:"text" as const,text:JSON.stringify(value,null,2)}]});
+ server.tool("flow_create_project","Create an ORBIT Flow project.",{name:z.string().min(1).max(120),description:z.string().max(2000).optional()},async input=>out(await flow.createProject(userId,input)));
+ server.tool("flow_list_projects","List projects.",{},async()=>out(await flow.listProjects(userId)));
+ server.tool("flow_create_task","Create a task.",{title:z.string().min(1).max(200),description:z.string().max(4000).optional(),projectId:z.string().uuid().optional(),priority:z.enum(["low","medium","high","urgent"]).optional()},async input=>out(await flow.createTask(userId,input)));
+ server.tool("flow_list_tasks","List tasks.",{projectId:z.string().uuid().optional()},async input=>out(await flow.listTasks(userId,input.projectId)));
+ server.tool("flow_update_task","Update a task.",{id:z.string().uuid(),status:z.enum(["todo","in_progress","done"]).optional(),priority:z.enum(["low","medium","high","urgent"]).optional(),title:z.string().max(200).optional(),description:z.string().max(4000).optional()},async({id,...patch})=>out(await flow.updateTask(userId,id,patch)));
+ server.tool("flow_save_research","Save a research note.",{title:z.string().min(1).max(200),content:z.string().min(1).max(20000),projectId:z.string().uuid().optional(),sourceUrl:z.string().url().optional(),tags:z.array(z.string().max(40)).max(20).optional()},async input=>out(await flow.saveResearch(userId,input)));
+ server.tool("flow_search_research","Search saved research.",{query:z.string().min(1).max(200)},async({query})=>out(await flow.searchResearch(userId,query)));
+ server.tool("dev_analyze_github_repo","Inspect GitHub repository metadata and file tree.",{owner:z.string().regex(/^[A-Za-z0-9-]+$/),repo:z.string().regex(/^[A-Za-z0-9_.-]+$/)},async({owner,repo})=>out(await dev.analyzeGithubRepo(owner,repo)));
+ server.tool("dev_review_code","Run heuristic code-risk checks.",{code:z.string().min(1).max(50000),language:z.string().max(40).optional()},async({code,language})=>out(dev.reviewCode(code,language)));
+ server.tool("dev_test_api","Test a public HTTP endpoint; local and private destinations are blocked.",{url:z.string().url(),method:z.enum(["GET","POST","PUT","PATCH","DELETE"]),body:z.record(z.unknown()).optional()},async({url,method,body})=>out(await dev.testApi(url,method,body)));
+ server.tool("dev_analyze_error","Analyze an error log.",{error:z.string().min(1).max(12000)},async({error})=>out(dev.analyzeError(error)));
+ server.tool("studio_create_design_brief","Create and save a design brief.",{title:z.string().min(1).max(160),product:z.string().min(1).max(500),audience:z.string().min(1).max(500),goals:z.array(z.string().min(1).max(300)).min(1).max(12),constraints:z.string().max(2000).optional(),style:z.string().max(500).optional()},async input=>out(await studio.createDesignBrief(userId,input)));
+ server.tool("studio_plan_website","Plan website pages and sections.",{name:z.string().min(1).max(160),purpose:z.string().min(1).max(500),audience:z.string().min(1).max(500),pages:z.array(z.string().min(1).max(60)).min(1).max(15)},async input=>out(studio.planWebsite(input)));
+ server.tool("studio_spec_component","Specify a reusable UI component.",{name:z.string().min(1).max(100),purpose:z.string().min(1).max(500),variants:z.array(z.string()).max(12).optional(),states:z.array(z.string()).max(12).optional()},async input=>out(studio.specComponent(input)));
+ server.tool("studio_create_content_pack","Draft marketing copy structures.",{brand:z.string().min(1).max(100),product:z.string().min(1).max(300),tone:z.string().max(100),channels:z.array(z.string().min(1).max(80)).min(1).max(8)},async input=>out(studio.createContentPack(input)));
+ const step=z.object({action:z.enum(["flow.create_project","flow.create_task","studio.plan_website","studio.spec_component","studio.create_content_pack"]),input:z.record(z.unknown())});
+ server.tool("automate_create_workflow","Save a workflow of allowlisted actions.",{name:z.string().min(1).max(120),description:z.string().max(1000).optional(),steps:z.array(step).min(1).max(12)},async input=>out(await automate.createWorkflow(userId,input)));
+ server.tool("automate_list_workflows","List saved workflows.",{},async()=>out(await automate.listWorkflows(userId)));
+ server.tool("automate_validate_workflow","Validate workflow steps.",{steps:z.array(step).min(1).max(12)},async({steps})=>out(await automate.validateWorkflow(steps as any)));
+ server.tool("automate_run_workflow","Run a saved workflow.",{workflowId:z.string().uuid()},async({workflowId})=>out(await automate.runWorkflow(userId,workflowId)));
+ server.tool("automate_get_execution","Get workflow execution details.",{executionId:z.string().uuid()},async({executionId})=>out(await automate.getExecution(userId,executionId)));
+ return server;
+}
