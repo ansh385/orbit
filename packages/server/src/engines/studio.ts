@@ -1,0 +1,15 @@
+import { pool } from "../db/pool.js";
+export async function createDesignBrief(userId:string,input:{title:string;product:string;audience:string;goals:string[];constraints?:string;style?:string}) {
+ const brief={product:input.product,audience:input.audience,goals:input.goals,constraints:input.constraints??"",visualDirection:input.style??"Clear, accessible, responsive, and purpose-led.",deliverables:["Information architecture","Key user flows","Responsive layout direction","Component inventory","Accessibility checklist"],successCriteria:["Users can complete the primary task","Core screens work on mobile and desktop","Keyboard and screen-reader basics are covered"]};
+ const r=await pool.query("INSERT INTO design_briefs(user_id,title,brief) VALUES($1,$2,$3) RETURNING id,title,brief,created_at",[userId,input.title,JSON.stringify(brief)]);return r.rows[0];
+}
+export function planWebsite(input:{name:string;purpose:string;audience:string;pages:string[]}) {
+ const sections:Record<string,string[]>={home:["Hero and primary action","Value proposition","Proof or featured work","How it works","FAQ","Footer"],about:["Mission","Story","Team or founder","Principles","Call to action"],services:["Overview","Service cards","Process","Deliverables","FAQ","Contact action"],portfolio:["Introduction","Featured projects","Filters or categories","Case-study links","Contact action"],contact:["Contact options","Short form","Response expectation","Trust information"]};
+ return {website:input.name,purpose:input.purpose,audience:input.audience,pages:input.pages.map(page=>({name:page,sections:sections[page.toLowerCase()]??["Page introduction","Primary content","Supporting information","Next action"]})),globalRequirements:["Responsive layout","Semantic headings","Visible focus states","Accessible form labels","Optimized images","Clear metadata"]};
+}
+export function specComponent(input:{name:string;purpose:string;variants?:string[];states?:string[]}) {
+ return {component:input.name,purpose:input.purpose,variants:input.variants?.length?input.variants:["default"],states:input.states?.length?input.states:["default","hover","focus","disabled"],anatomy:["Container","Content","Optional leading/trailing slot"],accessibility:["Use semantic HTML","Support keyboard interaction","Expose accessible name","Maintain visible focus"],responsive:"Avoid fixed widths; allow content to wrap."};
+}
+export function createContentPack(input:{brand:string;product:string;tone:string;channels:string[]}) {
+ return {brand:input.brand,product:input.product,tone:input.tone,content:input.channels.map(channel=>({channel,draft:`${input.product} by ${input.brand}: a practical solution designed around what matters. Tone: ${input.tone}. Learn more and see whether it fits your needs.`,reviewRequired:true})),note:"Draft copy only. Verify claims, prices, links and brand voice before publishing."};
+}
