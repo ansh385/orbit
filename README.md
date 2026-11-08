@@ -1,22 +1,12 @@
-<!-- ORBIT — README | Premium project overview -->
+<!-- ORBIT — README | ChatGPT-first open-source workspace -->
 
 <div align="center">
   <img src="assets/orbit-banner.svg" alt="ORBIT — Your AI. More capable." width="100%" />
-
   <p><strong>One workspace. Four focused engines. Open by design.</strong></p>
-
   <p>
-    <a href="https://github.com/ansh385/orbit"><img src="https://img.shields.io/badge/status-in%20development-caff55?style=for-the-badge&labelColor=101820" alt="In development" /></a>
+    <a href="https://github.com/ansh385/orbit"><img src="https://img.shields.io/badge/status-early%20development-caff55?style=for-the-badge&labelColor=101820" alt="Early development" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-8bd5a7?style=for-the-badge&labelColor=101820" alt="MIT License" /></a>
-    <a href="https://github.com/ansh385/orbit"><img src="https://img.shields.io/badge/platform-self--hosted-9bb7c8?style=for-the-badge&labelColor=101820" alt="Self hosted" /></a>
-  </p>
-
-  <p>
-    <a href="#-what-is-orbit">Explore</a> ·
-    <a href="#-the-four-engines">Engines</a> ·
-    <a href="#-architecture">Architecture</a> ·
-    <a href="#-documentation">Documentation</a> ·
-    <a href="#-roadmap">Roadmap</a>
+    <a href="https://github.com/ansh385/orbit"><img src="https://img.shields.io/badge/AI%20interface-ChatGPT-9bb7c8?style=for-the-badge&labelColor=101820" alt="ChatGPT interface" /></a>
   </p>
 </div>
 
@@ -24,177 +14,116 @@
 
 ## ◈ What is ORBIT?
 
-**ORBIT is an open-source, self-hosted AI workspace designed to turn a general-purpose assistant into a set of focused tools for getting work done.**
+**ORBIT is an open-source capability layer that gives a compatible AI client a focused set of tools for planning, building, creating, and automating work. ChatGPT is the intended primary interface.**
 
-Instead of scattering capabilities across disconnected apps, ORBIT brings four engines into one platform:
+ORBIT is organised as four engines:
 
-- **Flow** to organise projects, tasks, and research.
-- **Dev** to help inspect repositories and reason about code.
-- **Studio** to shape design, product, and content work.
-- **Automate** to compose repeatable workflows from controlled actions.
+- **Flow** — projects, tasks, research, and working context.
+- **Dev** — repository inspection, code-risk heuristics, API checks, and error analysis.
+- **Studio** — design briefs, website plans, component specifications, and content packs.
+- **Automate** — saved workflows composed from explicitly allowlisted ORBIT actions.
 
-ORBIT is being built around the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), with a React dashboard and PostgreSQL-backed services.
+The goal is simple: work with ORBIT from ChatGPT instead of having to use a separate ORBIT dashboard for everyday tasks. The dashboard in this repository is an optional administration/demo interface, not the intended primary user experience.
 
-> **Project status:** early development. The repository is currently being assembled; the complete application source, runnable release, and end-to-end verification are not yet published here. Documentation describes the intended setup and direction, not a claim that every feature is production-ready.
+## ✳ ChatGPT-first, not a second AI subscription
 
-## ✳ The four engines
+ORBIT's core tools do **not** call a separate paid AI API. ChatGPT supplies the conversational reasoning; ORBIT supplies the tools, persistent records, and controlled actions through the Model Context Protocol (MCP).
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>◉ FLOW</h3>
-      <p><strong>Think clearly. Keep moving.</strong></p>
-      A workspace for project context, tasks, planning, and research.
-      <ul>
-        <li>Project and task organisation</li>
-        <li>Research and structured notes</li>
-        <li>Context that stays connected to the work</li>
-      </ul>
-    </td>
-    <td width="50%" valign="top">
-      <h3>⌘ DEV</h3>
-      <p><strong>Understand the codebase.</strong></p>
-      Developer-focused tools for inspecting and reasoning about software.
-      <ul>
-        <li>Repository inspection</li>
-        <li>Code review assistance</li>
-        <li>API and error analysis</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>✧ STUDIO</h3>
-      <p><strong>Turn ideas into clear specifications.</strong></p>
-      A creative and product-planning space for shaping deliverables.
-      <ul>
-        <li>Design and product briefs</li>
-        <li>Website and component specifications</li>
-        <li>Structured content packs</li>
-      </ul>
-    </td>
-    <td width="50%" valign="top">
-      <h3>↗ AUTOMATE</h3>
-      <p><strong>Make repeatable work reusable.</strong></p>
-      A workflow layer built around explicitly allowed ORBIT actions.
-      <ul>
-        <li>Reusable workflow definitions</li>
-        <li>Allowlisted action execution</li>
-        <li>Human-controlled operation boundaries</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+That does not mean ChatGPT hosts ORBIT's backend. A remote MCP server and a database still need to run somewhere. ORBIT uses standard open-source components and can be self-hosted. A free hosting/database combination may be used for a ₹0 demo, but those providers are infrastructure dependencies—not part of ChatGPT—and their free tiers have limits.
 
-## ⌁ Why ORBIT?
+**ChatGPT plan compatibility is a separate requirement.** Custom remote MCP apps/connectors and write permissions depend on the ChatGPT plan, client features, and workspace settings. ORBIT cannot unlock or bypass those restrictions. Check [ChatGPT connection requirements](docs/CHATGPT-SETUP.md) before deploying. In particular, do not assume a Go account can connect a custom write-capable MCP server.
 
-| Principle | What it means |
+## ◈ The four engines
+
+| Engine | Capabilities |
 |---|---|
-| **One platform** | Four focused engines share a common foundation. |
-| **Open source** | MIT-licensed project with a public development path. |
-| **Self-hosted first** | Keep deployment and data under your control. |
-| **MCP-native direction** | Designed to connect AI clients through a standard tool interface. |
-| **Guardrails matter** | Automation should use explicit permissions and controlled actions. |
+| **Flow** | Create/list projects and tasks, update task status, save and search research |
+| **Dev** | Inspect public GitHub repositories, run heuristic code checks, test public HTTP APIs, explain error logs |
+| **Studio** | Save design briefs, plan website structure, specify components, draft content packs |
+| **Automate** | Create, validate, list, and execute workflows built from allowlisted Flow/Studio actions |
 
-## ⌘ Architecture
+These are tool capabilities, not claims that ORBIT autonomously performs every action in an external service. For example, repository analysis is not the same as committing code or opening pull requests.
 
-The target architecture separates the user interface, service layer, data store, and MCP integration.
+## ⌁ Architecture
 
 ```mermaid
 flowchart TB
-    U[User] --> UI[ORBIT Dashboard<br/>React + TypeScript]
-    AI[Compatible AI Client] --> MCP[MCP Interface]
-    UI --> API[ORBIT Service Layer<br/>Node.js + TypeScript]
-    MCP --> API
-    API --> F[Flow]
-    API --> D[Dev]
-    API --> S[Studio]
-    API --> A[Automate]
-    F --> DB[(PostgreSQL)]
-    D --> DB
-    S --> DB
-    A --> DB
+    U[You] --> C[ChatGPT]
+    C <-->|Remote MCP over HTTPS| M[ORBIT MCP server]
+    M --> E[Flow · Dev · Studio · Automate]
+    E --> DB[(PostgreSQL)]
+    A[Optional ORBIT dashboard] --> M
 ```
 
-<sub>Conceptual target architecture; implementation details may evolve during development.</sub>
+- **ChatGPT** is the intended conversational interface and model.
+- **ORBIT MCP server** exposes the engine tools.
+- **PostgreSQL** stores projects, tasks, research, briefs, workflows, executions, and audit records.
+- **Dashboard** is optional; it is not required for ChatGPT tool use.
 
-## 💸 Zero-budget deployment
+## 💸 ₹0 deployment target
 
-ORBIT is designed around a **₹0/month development and demo target**. The proposed hosted stack is a free Render Node.js web service + Neon Free PostgreSQL + GitHub. No paid AI API is required for the core MCP tools; ChatGPT is the intended AI interface.
+The project is designed to be deployable on free tiers for personal testing and demos:
 
-Free tiers have hard limits: the Render service sleeps after inactivity, Neon has storage/compute/network quotas, and providers can change their plans. This is suitable for a hobby/demo deployment, **not guaranteed production uptime**.
+| Layer | Candidate | Reality |
+|---|---|---|
+| Source and CI | GitHub | Free allowances and usage limits apply |
+| MCP server | Render Free Web Service | Sleeps when idle; cold starts; no production SLA |
+| PostgreSQL | Neon Free | Quotas and provider policies apply |
+| AI reasoning | Existing ChatGPT account | No separate ORBIT model API key; MCP access depends on ChatGPT plan |
 
-- [Zero-budget deployment guide](docs/ZERO-BUDGET-DEPLOYMENT.md)
-- [ChatGPT connection requirements](docs/CHATGPT-SETUP.md)
+This is a **₹0 target, not a guarantee**. Free tiers can change, pause, or impose limits. Do not add a payment method if the hard budget is zero. See [zero-budget deployment](docs/ZERO-BUDGET-DEPLOYMENT.md).
 
-**Important:** ORBIT v0.1.0 currently uses a single-owner bearer token. It is not a public multi-user SaaS and does not yet implement OAuth 2.1 or tenant isolation. Do not share one token with public users.
+## ⚠️ Current release limitations
 
-## ⚙️ Technology direction
+ORBIT is early development. The repository has a working source structure and CI build, but a green build is not proof of a successful live ChatGPT connection.
 
-<div align="center">
+- Authentication currently uses a single-owner bearer token. It is not OAuth 2.1 and is not a public multi-user SaaS.
+- The current server maps requests to one configured owner ID. Do not share a token with unrelated users.
+- ChatGPT custom MCP connection and write-action availability must be confirmed for the account/workspace being used.
+- Hosted database migrations, live MCP tool calls, and end-to-end ChatGPT interaction still require verification.
+- Free hosting may sleep and cold-start. No uptime guarantee is made.
 
-| Layer | Technology |
-|:--|:--|
-| Dashboard | React · TypeScript · Vite |
-| Backend | Node.js · TypeScript |
-| AI integration | Model Context Protocol (MCP) |
-| Database | PostgreSQL |
-| Local deployment | Docker · Docker Compose |
+Never publish `.env`, database URLs, API tokens, or private repository credentials.
 
-</div>
+## 🚀 Source and development
 
-## 🚀 Getting started
+The source is in this repository. Contributors may run it locally, but **local Node/PostgreSQL setup is not required for an end user of a hosted ChatGPT-connected ORBIT instance**.
 
-The application source and first runnable release are not yet available in this repository, so there is no honest install command to provide yet. Follow the documentation for the planned environment and connection model; the quick-start commands will be added once the source is published and verified.
+- [Installation and contributor setup](docs/INSTALLATION.md)
+- [ChatGPT connection guide](docs/CHATGPT-SETUP.md)
+- [Zero-budget deployment](docs/ZERO-BUDGET-DEPLOYMENT.md)
+- [Operations](docs/OPERATIONS.md)
+- [Security](SECURITY.md)
+- [Roadmap](ROADMAP.md)
 
-**Planned local prerequisites**
-- Windows 11, macOS, or Linux
-- Node.js 22+
-- PostgreSQL 15+
-- Docker (optional, for container-based setup)
+## 🧪 Verification status
 
-## 📚 Documentation
+The GitHub Actions workflow currently verifies dependency installation, TypeScript type-checking, and production builds. It does not yet verify a deployed database, every engine operation, or a live ChatGPT MCP session.
 
-| Guide | What you'll find |
-|---|---|
-| [Installation](docs/INSTALLATION.md) | Environment preparation and setup direction |
-| [ChatGPT connection](docs/CHATGPT-SETUP.md) | How the MCP connection is intended to work |
-| [Zero-budget deployment](docs/ZERO-BUDGET-DEPLOYMENT.md) | Free hosting plan and limits |\n| [Operations](docs/OPERATIONS.md) | Deployment and operational notes |
-| [Security](SECURITY.md) | Security expectations and reporting |
-| [Contributing](CONTRIBUTING.md) | How to contribute |
-| [Roadmap](ROADMAP.md) | Planned milestones |
+[View latest CI runs](https://github.com/ansh385/orbit/actions).
 
 ## 🗺 Roadmap
 
-- [x] Define the four-engine product direction
-- [x] Publish project documentation and contribution guidelines
-- [ ] Publish the complete application source
-- [ ] Verify clean installation and database migrations
-- [ ] Verify each engine with automated tests
-- [ ] Validate MCP connection with a compatible client
-- [ ] Publish a tagged, reproducible release
-
-See the full [roadmap](ROADMAP.md) for details.
+- [x] Define Flow, Dev, Studio, and Automate
+- [x] Publish application source and MCP tool definitions
+- [x] Add CI install, type-check, and build checks
+- [ ] Run database migrations on a clean hosted database
+- [ ] Add meaningful engine and MCP protocol integration tests
+- [ ] Implement secure per-user authentication and tenant isolation
+- [ ] Verify a live remote MCP connection in a ChatGPT account that supports it
+- [ ] Publish a reproducible release
 
 ## 🤝 Contributing
 
-ORBIT is intended to be built in the open. Before proposing a large change, read [CONTRIBUTING.md](CONTRIBUTING.md), check the roadmap, and open an issue to discuss the approach.
-
-Bug reports and focused improvements are welcome. Please do not submit secrets, access tokens, private repository data, or other sensitive information in issues.
-
-## 🔐 Security
-
-Do not expose a development instance to the public internet with default or missing credentials. Review [SECURITY.md](SECURITY.md) before deploying or reporting a vulnerability.
+Read [CONTRIBUTING.md](CONTRIBUTING.md), check [ROADMAP.md](ROADMAP.md), and open an issue before large changes. Do not include secrets, tokens, or private data in issues or pull requests.
 
 ## 📄 License
 
-ORBIT is released under the [MIT License](LICENSE).
-
----
+MIT — see [LICENSE](LICENSE).
 
 <div align="center">
   <strong>ORBIT</strong><br/>
-  <sub>One workspace. Four engines. Built in the open.</sub><br/><br/>
-  <a href="https://github.com/ansh385/orbit">Star the repository</a> ·
-  <a href="https://github.com/ansh385/orbit/issues">Report an issue</a>
+  <sub>One workspace. Four engines. ChatGPT-first. Built in the open.</sub><br/><br/>
+  <a href="https://github.com/ansh385/orbit">Repository</a> ·
+  <a href="https://github.com/ansh385/orbit/issues">Issues</a>
 </div>
