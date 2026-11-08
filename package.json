@@ -1,0 +1,18 @@
+{
+  "name": "orbit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c green,cyan \"npm run dev -w @orbit/server\" \"npm run dev -w @orbit/web\"",
+    "build": "npm run build -w @orbit/server && npm run build -w @orbit/web",
+    "start": "npm run start -w @orbit/server",
+    "test": "npm run test -w @orbit/server",
+    "typecheck": "npm run typecheck -w @orbit/server && npm run typecheck -w @orbit/web",
+    "db:migrate": "npm run db:migrate -w @orbit/server",
+    "db:seed": "npm run db:seed -w @orbit/server"
+  },
+  "devDependencies": { "concurrently": "^9.1.2", "typescript": "^5.8.3" },
+  "engines": { "node": ">=22.0.0" }
+}
